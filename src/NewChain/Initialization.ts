@@ -134,21 +134,21 @@ export default class Initialization {
     auxiliaryChain.genesis = auxiliaryChainInteract.getGenesis();
     auxiliaryChain.bootNodes.push(Initialization.getBootNode(auxiliaryChainInteract, auxiliaryNodeDescription.port));
 
-    const {
-      blockNumber: originBlockNumber,
-      stateRoot: originStateRoot,
-      messageHash: originMessageHash,
-      nonce: stakeMessageNonce,
-    } = await originChainInteract.stake(auxiliaryChainInteract.auxiliaryDeployer, hashLockSecret);
+    // const {
+    //   blockNumber: originBlockNumber,
+    //   stateRoot: originStateRoot,
+    //   messageHash: originMessageHash,
+    //   nonce: stakeMessageNonce,
+    // } = await originChainInteract.stake(auxiliaryChainInteract.auxiliaryDeployer, hashLockSecret);
 
-    const proofData: Proof = await Initialization.getStakeProof(
-      originChainInteract.getWeb3(),
-      auxiliaryChainInteract.getWeb3(),
-      auxiliaryChain.contractAddresses.origin.ostEIP20GatewayAddress,
-      originMessageHash,
-      originBlockNumber,
-      originStateRoot,
-    );
+    // const proofData: Proof = await Initialization.getStakeProof(
+    //   originChainInteract.getWeb3(),
+    //   auxiliaryChainInteract.getWeb3(),
+    //   auxiliaryChain.contractAddresses.origin.ostEIP20GatewayAddress,
+    //   originMessageHash,
+    //   originBlockNumber,
+    //   originStateRoot,
+    // );
 
     const {
       anchorOrganization,
@@ -158,11 +158,11 @@ export default class Initialization {
       ostCoGateway,
     } = await auxiliaryChainInteract.initializeContracts(
         auxiliaryChain.contractAddresses.origin.ostEIP20GatewayAddress,
-      originBlockNumber.toString(10),
-      originStateRoot,
-      stakeMessageNonce,
+      "1",//originBlockNumber.toString(10),
+      Web3.utils.sha3("1"),//originStateRoot,
+      "1",//stakeMessageNonce,
       hashLockSecret,
-      proofData,
+        {} as Proof//proofData,
     );
     auxiliaryChain.contractAddresses.auxiliary.anchorOrganizationAddress = anchorOrganization.address;
     auxiliaryChain.contractAddresses.auxiliary.anchorAddress = anchor.address;
@@ -172,18 +172,18 @@ export default class Initialization {
 
     // Progressing on both chains in parallel (with hash lock secret).
     // Giving the deployer the amount of coins that were originally staked as tokens on origin.
-    await Promise.all([
-      originChainInteract.progressWithSecret(
-          auxiliaryChain.contractAddresses.auxiliary.ostEIP20CogatewayAddress,
-        originMessageHash,
-        hashLockSecret,
-      ),
-      auxiliaryChainInteract.progressWithSecret(
-          auxiliaryChain.contractAddresses.auxiliary.ostEIP20CogatewayAddress,
-        originMessageHash,
-        hashLockSecret,
-      ),
-    ]);
+    // await Promise.all([
+    //   originChainInteract.progressWithSecret(
+    //       auxiliaryChain.contractAddresses.auxiliary.ostEIP20CogatewayAddress,
+    //     originMessageHash,
+    //     hashLockSecret,
+    //   ),
+    //   auxiliaryChainInteract.progressWithSecret(
+    //       auxiliaryChain.contractAddresses.auxiliary.ostEIP20CogatewayAddress,
+    //     originMessageHash,
+    //     hashLockSecret,
+    //   ),
+    // ]);
     mosaicConfig.writeToMosaicConfigDirectory();
   }
 

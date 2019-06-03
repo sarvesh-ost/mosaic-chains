@@ -193,13 +193,13 @@ export default class AuxiliaryChainInteract {
       originStateRoot,
     );
 
-    await this.transferAllOstIntoOstPrime(ostPrime.address);
-    await this.proveStake(
-      ostCoGateway.address,
-      stakeMessageNonce,
-      hashLockSecret,
-      proofData,
-    );
+    // await this.transferAllOstIntoOstPrime(ostPrime.address);
+    // await this.proveStake(
+    //   ostCoGateway.address,
+    //   stakeMessageNonce,
+    //   hashLockSecret,
+    //   proofData,
+    // );
 
     return {
       anchorOrganization,

@@ -1,0 +1,11 @@
+{
+    "originChain": {
+        "contractAddresses": {
+            "gatewayLibAddress": "0x25Ff5dc79A7c4e34254ff0f4a19d69E491201DD3",
+            "messageBusAddress": "0xaf517E20601Df8d8584035EB895C02713bC1f3A4",
+            "merklePatriciaLibAddress": "0xFCaf25bF38E7C86612a25ff18CB8e09aB07c9885"
+        },
+        "chain": "1000"
+    },
+    "auxiliaryChains": {}
+}
