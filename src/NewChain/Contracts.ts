@@ -69,11 +69,9 @@ export default class Contracts {
     bounty: string,
     organizationAddress: string,
     burnerAddress: string,
-  ): Promise<ContractInteract.EIP20Gateway> {
-    const {
-      gatewayLib,
-      messageBus,
-    } = await Contracts.deployGatewayLibraries(web3, txOptions);
+    messageBusAddress: string,
+    gatewayLibAddress: string,
+): Promise<ContractInteract.EIP20Gateway> {
 
     const ostGateway: ContractInteract.EIP20Gateway = await ContractInteract.EIP20Gateway.deploy(
       web3,
@@ -83,8 +81,8 @@ export default class Contracts {
       bounty,
       organizationAddress,
       burnerAddress,
-      messageBus.address,
-      gatewayLib.address,
+      messageBusAddress,
+      gatewayLibAddress,
       txOptions,
     );
     Contracts.logContractDeployment('ostGateway', ostGateway);
@@ -154,12 +152,13 @@ export default class Contracts {
   /**
    * Deploys the required gateway libraries and returns them to be set on a gateway or co-gateway.
    */
-  private static async deployGatewayLibraries(
+  public static async deployGatewayLibraries(
     web3: Web3,
     txOptions: Tx,
   ): Promise<{
     gatewayLib: ContractInteract.GatewayLib;
     messageBus: ContractInteract.MessageBus;
+    merklePatriciaProof: ContractInteract.MerklePatriciaProof;
   }> {
     const merklePatriciaProof = await ContractInteract.MerklePatriciaProof.deploy(
       web3,
@@ -185,6 +184,7 @@ export default class Contracts {
     return {
       gatewayLib,
       messageBus,
+      merklePatriciaProof,
     };
   }
 

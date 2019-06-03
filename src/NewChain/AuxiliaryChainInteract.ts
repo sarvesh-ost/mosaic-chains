@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as RLP from 'rlp';
-import { ContractInteract } from '@openst/mosaic.js';
+import { ContractInteract, Contracts as MosaicContracts } from '@openst/mosaic.js';
 
 import { Tx } from 'web3/eth/types';
 import CliqueGenesis from './CliqueGenesis';
@@ -19,7 +19,8 @@ import Web3 = require('web3');
 /**
  * The new auxiliary chain that shall be created.
  */
-export default class AuxiliaryChain {
+export default class AuxiliaryChainInteract {
+
   private web3: Web3;
 
   private chainDir: string;
@@ -49,6 +50,12 @@ export default class AuxiliaryChain {
   private gatewayLibDeploymentNonce = 5;
 
   private coGatewayDeploymentNonce = 7;
+
+  private _auxiliarySealer: string;
+
+  private _auxiliaryDeployer: string;
+
+  private bootKeyFilePath: string;
 
   /*
   Anchor
@@ -220,6 +227,73 @@ export default class AuxiliaryChain {
   }
 
   /**
+   * Resets organization contracts admin address to `address(0)`.
+   *
+   * @param organization Auxiliary chain organization address.
+   * @param txOptions Transaction options.
+   *
+   * @returns {Promise} Promise containing transaction receipt.
+   */
+  public async resetOrganizationAdmin(
+    organization,
+    txOptions,
+  ): Promise<Object> {
+    this.logInfo('reseting auxiliary chain organization admin.', { organization, txOptions } );
+    // ContractInteract.Organization doesn't implement setAdmin function in mosaic.js.
+    // That's why MosaicContracts being used here.
+    const contractInstance = new MosaicContracts(undefined, this.web3);
+    const tx = contractInstance.AuxiliaryOrganization(organization)
+          .methods.setAdmin('0x0000000000000000000000000000000000000000');
+    return tx.send(txOptions);
+  }
+
+  /**
+   * This returns genesis of the auxiliary chain.
+   */
+  public getGenesis(): any {
+    return CliqueGenesis.create(this.chainId, this.sealer, this.deployer);
+  }
+
+  /**
+   *  This returns boot node of the auxiliary chain.
+   */
+  public getBootNode():string {
+    const bootNodeKey = fs.readFileSync(this.bootKeyFilePath).toString();
+
+    let bootNode = Shell.executeInShell(`bootnode --nodekeyhex ${bootNodeKey} --writeaddress`);
+    return bootNode.toString().trim();
+  }
+
+  /**
+   * Getter for auxiliary deployer.
+   */
+  get auxiliaryDeployer(): string {
+    return this._auxiliaryDeployer;
+  }
+
+  /**
+   * Setter for auxiliary deployer.
+   * @param value Deployer address.
+   */
+  set auxiliaryDeployer(value: string) {
+    this._auxiliaryDeployer = value;
+  }
+
+  /**
+   * Getter for origin sealer.
+   */
+  get auxiliarySealer(): string {
+    return this._auxiliarySealer;
+  }
+
+  /**
+   *
+   * @param value Sealer address.
+   */
+  set auxiliarySealer(value: string) {
+    this._auxiliarySealer = value;
+  }
+  /**
    * Generates two new accounts with an ethereum node and adds the addresses to the mosaic config
    * as auxiliaryOriginalSealer and auxiliaryOriginalDeployer. These accounts will be used to run
    * the sealer and deploy the contracts on auxiliary.
@@ -303,7 +377,7 @@ export default class AuxiliaryChain {
     const timeToWaitInSecs = 4;
     let unlockStatus: boolean;
     do {
-      await AuxiliaryChain.sleep(timeToWaitInSecs * 1000);
+      await AuxiliaryChainInteract.sleep(timeToWaitInSecs * 1000);
       totalWaitTimeInSeconds += timeToWaitInSecs;
       if (totalWaitTimeInSeconds > (this.maxTriesToUnlockAccounts * timeToWaitInSecs)) {
         throw new Error('node did not unlock accounts in time');
@@ -593,6 +667,7 @@ export default class AuxiliaryChain {
     ];
     Shell.executeDockerCommand(args);
 
+    this.bootKeyFilePath = `${this.chainDir}/${bootKeyFile}`;
     return bootKeyFile;
   }
 

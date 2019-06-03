@@ -1,15 +1,16 @@
-import { ContractInteract } from '@openst/mosaic.js';
+import { ContractInteract, Contracts as MosaicContracts } from '@openst/mosaic.js';
 import InitConfig from '../Config/InitConfig';
 import Logger from '../Logger';
 import Contracts from './Contracts';
 import Integer from '../Integer';
 
 import Web3 = require('web3');
+import {OriginLibraries} from "../Config/MosaicConfig";
 
 /**
  * The origin chain when creating a new auxiliary chain.
  */
-export default class OriginChain {
+export default class OriginChainInteract {
   private chainId: string;
 
   private ostGateway: ContractInteract.EIP20Gateway;
@@ -45,6 +46,7 @@ export default class OriginChain {
   public async deployContracts(
     auxiliaryStateRootZero: string,
     expectedOstCoGatewayAddress: string,
+    originLibraries: OriginLibraries,
   ): Promise<{
     anchorOrganization: ContractInteract.Organization;
     anchor: ContractInteract.Anchor;
@@ -66,7 +68,7 @@ export default class OriginChain {
       auxiliaryStateRootZero,
     );
 
-    // Owner of the organization has to be the deployer, as we need to be able to activate the
+    // Admin of the organization has to be the deployer, as we need to be able to activate the
     // gateway
     const ostGatewayOrganization = await this.deployOrganization(
       this.initConfig.originGatewayOrganizationOwner,
@@ -76,6 +78,7 @@ export default class OriginChain {
     const ostGateway = await this.deployGateway(
       anchor.address,
       ostGatewayOrganization.address,
+      originLibraries,
     );
 
     this.logInfo(
@@ -162,6 +165,46 @@ export default class OriginChain {
   }
 
   /**
+   * Resets organization contracts admin address to `address(0)`.
+   *
+   * @param organization Origin chain organization address.
+   * @param txOptions Transaction options.
+   *
+   * @returns {Promise} Promise containing transaction receipt.
+   */
+  public async resetOrganizationAdmin(
+    organization,
+    txOptions,
+  ): Promise<Object> {
+    this.logInfo("reseting origin chain organization admin", { organization, txOptions } );
+    // ContractInteract.Organization doesn't implement setAdmin function in mosaic.js.
+    // That's why MosaicContracts being used here.
+    const contractInstance = new MosaicContracts(this.web3, null);
+    const tx = contractInstance.OriginOrganization(organization)
+           .methods.setAdmin('0x0000000000000000000000000000000000000000');
+    return tx.send(txOptions);
+  }
+
+
+  /**
+   * This deploys libraries on the origin chain.
+   *
+   * @param {Web3} web3 Web3 instance points to origin chain
+   * @param {string} deployer Address of the deployer.
+   * @return {Promise<Object>} mosaicLibraries Contract instance of mosaic libraries.
+   */
+  public static deployLibraries(
+    web3: Web3,
+    deployer: string,
+  ): Promise<{
+    gatewayLib: ContractInteract.GatewayLib;
+    messageBus: ContractInteract.MessageBus;
+    merklePatriciaProof: ContractInteract.MerklePatriciaProof;
+    }> {
+    return Contracts.deployGatewayLibraries(web3, {from: deployer});
+  }
+
+  /**
    * Deploys an organization contract.
    * @param owner Will be the owner address of the deployed organization.
    * @param admin Will be the admin address of the deployed organization.
@@ -203,6 +246,7 @@ export default class OriginChain {
   private deployGateway(
     anchorAddress: string,
     organizationAddress: string,
+    originLibraries: OriginLibraries,
   ): Promise<ContractInteract.EIP20Gateway> {
     this.logInfo('deploying ost gateway', { anchorAddress, organizationAddress });
     return Contracts.deployOstGateway(
@@ -213,6 +257,8 @@ export default class OriginChain {
       this.initConfig.originBounty,
       organizationAddress,
       this.initConfig.originBurnerAddress,
+      originLibraries.messageBusAddress,
+      originLibraries.gatewayLibAddress,
     );
   }
 
