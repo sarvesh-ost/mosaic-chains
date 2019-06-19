@@ -1,11 +1,11 @@
 import * as path from 'path';
-import * as fs from 'fs-extra';
 import * as mustache from 'mustache';
 import Logger from '../Logger';
 import Shell from '../Shell';
 import Directory from '../Directory';
 import MosaicConfig from '../Config/MosaicConfig';
 import GraphDescription from './GraphDescription';
+import FileSystem from "../FileSystem ";
 
 /**
  * Represents a sub graph.
@@ -63,7 +63,7 @@ export default class SubGraph {
    * @return {object}
    */
   public deploy(): object {
-    if (fs.pathExistsSync(this.getSubGraphProjectDir)) {
+    if (FileSystem.pathExistsSync(this.getSubGraphProjectDir)) {
       // if subGraphProjectDir we would assume sub graph deployment was already complete
       this.logInfo('Sub graph already exists. Skipping deployment');
       return;
@@ -123,8 +123,8 @@ export default class SubGraph {
    */
   private copyCodeToTempDir(): void {
     this.logInfo('copying auto generated graph code to temp directory');
-    fs.ensureDirSync(this.getTempGraphInstallationDir);
-    fs.copySync(
+    FileSystem.ensureDirSync(this.getTempGraphInstallationDir);
+    FileSystem.copySync(
       Directory.getProjectAutoGenGraphDir(this.subGraphType),
       this.getTempGraphInstallationDir,
     );
@@ -147,7 +147,7 @@ export default class SubGraph {
       this.executeGraphCommand(`create --node http://localhost:${this.graphDescription.rpcAdminPort}/ ${this.name}`);
       return { success: true, message: '' };
     } catch (ex) {
-      const { message } = ex;
+      const message  = this.extractMessageFromError(ex);
       this.logInfo(`create local graph failed with: ${message}`);
       return { success: false, message };
     }
@@ -158,8 +158,8 @@ export default class SubGraph {
    */
   private writeSubGraphConfigFile(): void {
     this.logInfo('writing subgraph.yaml');
-    const fileContentBuffer = fs.readFileSync(path.join(this.getTempGraphInstallationDir, 'subgraph.yaml.mustache'));
-    fs.writeFileSync(
+    const fileContentBuffer = FileSystem.readFileSync(path.join(this.getTempGraphInstallationDir, 'subgraph.yaml.mustache'));
+    FileSystem.writeFileSync(
       path.join(this.getTempGraphInstallationDir, 'subgraph.yaml'),
       mustache.render(fileContentBuffer.toString(), this.templateVariables()),
     );
@@ -224,7 +224,7 @@ export default class SubGraph {
       );
       return{ success: true, message: '' };
     } catch (ex) {
-      const { message } = ex;
+      const message = this.extractMessageFromError(ex);
       this.logInfo(`deploy local graph failed with: ${message}`);
       this.logInfo('removing local graph');
       this.executeGraphCommand(`remove --node http://localhost:${this.graphDescription.rpcAdminPort}/ ${this.name}`);
@@ -245,7 +245,7 @@ export default class SubGraph {
    */
   private deleteCodeFromTempDir(): void {
     this.logInfo('deleting auto generated code from temp directory');
-    fs.removeSync(this.getTempGraphInstallationDir);
+    FileSystem.removeSync(this.getTempGraphInstallationDir);
   }
 
   /**
@@ -254,13 +254,31 @@ export default class SubGraph {
   private copyToSubGraphProjectDir(): void {
     this.logInfo('persisting auto generated graph code');
     const subGraphProjectDir = this.getSubGraphProjectDir;
-    fs.ensureDirSync(subGraphProjectDir);
-    fs.copySync(
+    FileSystem.ensureDirSync(subGraphProjectDir);
+    FileSystem.copySync(
       this.getTempGraphInstallationDir,
       subGraphProjectDir,
     );
   }
 
+  /**
+   * Extract message from error object.
+   * @param {Error} error
+   * @return {string}
+   */
+  private extractMessageFromError(error: Error): string {
+    const jsonError = JSON.stringify(error);
+    if (jsonError['error']) {
+      return jsonError['error'];
+    } else if (jsonError['stderr']) {
+      return jsonError['stderr'].trim.toString();
+    } else if (jsonError['stdout']) {
+      return jsonError['stdout'].trim.toString();
+    } else {
+     return 'Something went wrong';
+    }
+  }
+  
   /**
    * Logs the given message as `info`. Adds some params to the metadata of the log message.
    * @param message The message to log.
