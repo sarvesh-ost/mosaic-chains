@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import * as commander from 'commander';
-import { SubscriptionClient } from "subscriptions-transport-ws";
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import WebSocket = require('ws');
 
-import Logger from "../../../src/Logger";
+import Logger from '../../../src/Logger';
 
 let mosaic = commander
   .arguments('<auxiliary-chain-identifier> <graph-ws-port>');

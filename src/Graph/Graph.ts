@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as ip from 'ip';
+const waitPort = require('wait-port');
 import Logger from '../Logger';
 import Shell from '../Shell';
 import GraphDescription from './GraphDescription';
@@ -68,7 +69,7 @@ export default class Graph {
   /**
    * Starts the docker container that runs this graph.
    */
-  public start(): void {
+  public start(): Promise<void> {
     this.logInfo('attempting to start graph container');
     Graph.ensureNetworkExists();
     const commandParts = this.defaultDockerGraphCommand;
@@ -77,6 +78,7 @@ export default class Graph {
     const command = commandParts.join(' ');
     this.logInfo(`"start graph container command: ${command}"`);
     Shell.executeInShell(command);
+    return this.waitForNodeToBeAccessible();
   }
 
   /**
@@ -113,6 +115,31 @@ export default class Graph {
       `-f ${path.join(Directory.getProjectGraphDir(), 'docker-compose.yml')}`,
       '-p', this.containerName,
     ];
+  }
+
+  /**
+   * Returns a promise which resolves when node becomes accessible.
+   * @return {Promise<>}
+   */
+  private waitForNodeToBeAccessible(): Promise<any> {
+    const waitForWebsocketPort = waitPort({ port: this.websocketPort, output: 'silent' });
+    const waitForRpcAdminPort = waitPort({ port: this.rpcAdminPort, output: 'silent' });
+    const waitForRpcPort = waitPort({ port: this.rpcPort, output: 'silent' });
+    const waitForPostgresPort = waitPort({ port: this.postgresPort, output: 'silent' });
+    const waitForIpfsPort = waitPort({ port: this.ipfsPort, output: 'silent' });
+    // wait for all graph related ports to be available for use
+    return Promise.all([
+      waitForWebsocketPort,
+      waitForRpcAdminPort,
+      waitForRpcPort,
+      waitForPostgresPort,
+      waitForIpfsPort,
+    ]).then(function () {
+      return new Promise((resolve, reject) => {
+        // even after the ports are available the nodes need a bit of time to get online
+        setTimeout(resolve, 10000);
+      });
+    });
   }
 
   /**
