@@ -60,6 +60,7 @@
     "eslint-plugin-json": "1.4.0",
     "mocha": "6.1.4",
     "subscriptions-transport-ws": "0.9.16",
-    "ws": "7.0.0"
+    "ws": "7.0.0",
+    "sinon": "latest"
   }
 }
