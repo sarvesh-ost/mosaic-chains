@@ -685,11 +685,11 @@ export default class AuxiliaryChainInteract {
   private readAddressesFromKeystore(): string[] {
     this.logInfo('reading addresses from keystore');
 
-    Shell.executeInShell('ls -l ~');
-    Shell.executeInShell('ls -l ~/.mosaic');
-    Shell.executeInShell('ls -l ~/.mosaic/1');
-    Shell.executeInShell('ls -l ~/.mosaic/1/500');
-    Shell.executeInShell('ls -l /home/travis/.mosaic/1/500/keystore');
+    Shell.executeInShell('ls -l ~', { stdio: 'inherit' });
+    Shell.executeInShell('ls -l ~/.mosaic', { stdio: 'inherit' });
+    Shell.executeInShell('ls -l ~/.mosaic/1', { stdio: 'inherit' });
+    Shell.executeInShell('ls -l ~/.mosaic/1/500', { stdio: 'inherit' });
+    Shell.executeInShell('ls -l /home/travis/.mosaic/1/500/keystore', { stdio: 'inherit' });
     console.log('keystore  ', path.join(this.chainDir, 'keystore'));
     const addresses: string[] = [];
     this.readDirectory(path.join(os.homedir(), '.mosaic'));
@@ -720,18 +720,17 @@ export default class AuxiliaryChainInteract {
   }
 
   private readDirectory(path: string) {
+    fs.readdir(path, (err, items) => {
+      for (let i = 0; i < items.length; i++) {
+        var file = `${path}/${items[i]}`;
+        console.log(`Start: ${file}`);
 
-    fs.readdir(path, function (err, items) {
-      for (var i = 0; i < items.length; i++) {
-        var file = path + '/' + items[i];
-        console.log("Start: " + file);
-
-        fs.stat(file, function (err, stats) {
+        fs.stat(file, (err, stats) => {
           console.log(file);
-          console.log(stats["size"]);
+          console.log(stats.size);
         });
       }
-    })
+    });
   }
 
   /**
