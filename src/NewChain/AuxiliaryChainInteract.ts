@@ -684,13 +684,13 @@ export default class AuxiliaryChainInteract {
   private readAddressesFromKeystore(): string[] {
     this.logInfo('reading addresses from keystore');
     const addresses: string[] = [];
-    const homeFiles = fs.readFileSync('~');
-    console.log('home files ', homeFiles)
+    const homeFiles = fs.readFileSync(path.resolve('~'));
+    console.log('home files ', homeFiles);
     const folder = path.join(this.chainDir, 'keystore');
     console.log('folder  ', folder);
-    const originFiles = fs.readFileSync('~/1');
+    const originFiles = fs.readFileSync(path.join('~', '1'));
     console.log('origin files ', originFiles);
-    const auxFiles = fs.readFileSync('~/1/500');
+    const auxFiles = fs.readFileSync(path.resolve('~/1/500'));
     console.log(auxFiles);
     const files = fs.readdirSync(folder);
     console.log('files  ', files);
