@@ -8,6 +8,8 @@ env:
   - DOCKER_COMPOSE_VERSION=1.23.2
 before_install:
   - sudo apt-get install libsecret-1-dev
+  - mkdir ~/.mosaic
+  - chmod -R +rw ~/.mosaic
 node_js:
   - "11"
 branches:
