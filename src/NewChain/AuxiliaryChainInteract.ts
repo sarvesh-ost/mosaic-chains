@@ -4,6 +4,7 @@ import * as RLP from 'rlp';
 import { ContractInteract, Contracts as MosaicContracts } from '@openst/mosaic.js';
 
 import { Tx } from 'web3/eth/types';
+import * as os from 'os';
 import CliqueGenesis from './CliqueGenesis';
 import Contracts from './Contracts';
 import Shell from '../Shell';
@@ -683,14 +684,15 @@ export default class AuxiliaryChainInteract {
    */
   private readAddressesFromKeystore(): string[] {
     this.logInfo('reading addresses from keystore');
+    console.log('keystore  ', path.join(this.chainDir, 'keystore'));
     const addresses: string[] = [];
-    const homeFiles = fs.readFileSync(path.resolve('~'));
+    const homeFiles = fs.readFileSync(path.join(os.homedir(), '.mosaic'));
     console.log('home files ', homeFiles);
     const folder = path.join(this.chainDir, 'keystore');
     console.log('folder  ', folder);
-    const originFiles = fs.readFileSync(path.join('~', '1'));
+    const originFiles = fs.readFileSync(path.join(os.homedir(), '.mosaic', '1'));
     console.log('origin files ', originFiles);
-    const auxFiles = fs.readFileSync(path.resolve('~/1/500'));
+    const auxFiles = fs.readFileSync(path.join(os.homedir(), '.mosaic', '1', '500'));
     console.log(auxFiles);
     const files = fs.readdirSync(folder);
     console.log('files  ', files);
