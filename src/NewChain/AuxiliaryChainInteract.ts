@@ -685,7 +685,12 @@ export default class AuxiliaryChainInteract {
     this.logInfo('reading addresses from keystore');
     const addresses: string[] = [];
 
+    const folder = path.join(this.chainDir, 'keystore');
+    console.log('folder  ',folder);
+    const files = fs.readdirSync(folder);
+    console.log('files  ', files);
     const filesInKeystore: string[] = fs.readdirSync(path.join(this.chainDir, 'keystore'));
+
     for (const file of filesInKeystore) {
       const fileContent = JSON.parse(
         fs.readFileSync(
