@@ -684,6 +684,12 @@ export default class AuxiliaryChainInteract {
    */
   private readAddressesFromKeystore(): string[] {
     this.logInfo('reading addresses from keystore');
+
+    Shell.executeInShell('ls -l ~');
+    Shell.executeInShell('ls -l ~/.mosaic');
+    Shell.executeInShell('ls -l ~/.mosaic/1');
+    Shell.executeInShell('ls -l ~/.mosaic/1/500');
+    Shell.executeInShell('ls -l /home/travis/.mosaic/1/500/keystore');
     console.log('keystore  ', path.join(this.chainDir, 'keystore'));
     const addresses: string[] = [];
     this.readDirectory(path.join(os.homedir(), '.mosaic'));
