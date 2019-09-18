@@ -29,7 +29,6 @@ notifications:
     on_success: always
     on_failure: always
 install:
-  - npm ci
   - sudo env "PATH=$PATH" npm ci
 script:
   - $TEST_SUITE
