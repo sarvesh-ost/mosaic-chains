@@ -81,6 +81,6 @@ describe('Mosaic create', () => {
   after(() => {
     Shell.executeInShell(`./mosaic stop ${auxChainId}`);
     Utils.stopOriginChain();
-    Utils.cleanDirectories(`${originChainId}`);
+    // Utils.cleanDirectories(`${originChainId}`);
   });
 });
