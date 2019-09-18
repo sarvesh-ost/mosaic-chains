@@ -6,11 +6,6 @@ services:
 env:
   global:
     - DOCKER_COMPOSE_VERSION=1.23.2
-  matrix:
-    - TEST_SUITE="sudo env PATH=$PATH npm run test:unit"
-    - TEST_SUITE="sudo env PATH=$PATH npm run test:smoke"
-    - TEST_SUITE=" sudo env PATH=$PATH npm run test:package"
-    - TEST_SUITE="sudo env PATH=$PATH npm run test:integration"
 before_install:
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
@@ -29,8 +24,9 @@ notifications:
     on_success: always
     on_failure: always
 install:
-  - sudo env "PATH=$PATH" npm ci
+    - npm ci
 script:
-  - $TEST_SUITE
+  - sudo env PATH=$PATH npm run test
+
 after_failure:
   - cat /home/travis/.npm/_logs/*-debug.log
