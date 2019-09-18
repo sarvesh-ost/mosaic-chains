@@ -1,15 +1,22 @@
 dist: trusty
 language: node_js
-cache: npm
 sudo: required
 services:
   - docker
 env:
-  - DOCKER_COMPOSE_VERSION=1.23.2
+  global:
+    - DOCKER_COMPOSE_VERSION=1.23.2
+  matrix:
+    - TEST_SUITE="sudo env PATH=$PATH npm run test:unit"
+    - TEST_SUITE="sudo env PATH=$PATH npm run test:smoke"
+    - TEST_SUITE=" sudo env PATH=$PATH npm run test:package"
+    - TEST_SUITE="sudo env PATH=$PATH npm run test:integration"
 before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
   - sudo apt-get install libsecret-1-dev
-  - mkdir ~/.mosaic
-  - chmod -R +rw ~/.mosaic
 node_js:
   - "11"
 branches:
@@ -23,8 +30,8 @@ notifications:
     on_failure: always
 install:
   - npm ci
+  - sudo env "PATH=$PATH" npm ci
 script:
-  - sudo npm run test:integration
-  - ls -l ~/.mosaic
+  - $TEST_SUITE
 after_failure:
   - cat /home/travis/.npm/_logs/*-debug.log
