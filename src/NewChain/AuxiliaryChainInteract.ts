@@ -686,16 +686,12 @@ export default class AuxiliaryChainInteract {
     this.logInfo('reading addresses from keystore');
     console.log('keystore  ', path.join(this.chainDir, 'keystore'));
     const addresses: string[] = [];
-    const homeFiles = fs.readFileSync(path.join(os.homedir(), '.mosaic'));
-    console.log('home files ', homeFiles);
+    this.readDirectory(path.join(os.homedir(), '.mosaic'));
     const folder = path.join(this.chainDir, 'keystore');
     console.log('folder  ', folder);
-    const originFiles = fs.readFileSync(path.join(os.homedir(), '.mosaic', '1'));
-    console.log('origin files ', originFiles);
-    const auxFiles = fs.readFileSync(path.join(os.homedir(), '.mosaic', '1', '500'));
-    console.log(auxFiles);
-    const files = fs.readdirSync(folder);
-    console.log('files  ', files);
+    this.readDirectory(path.join(os.homedir(), '.mosaic', '1'));
+    this.readDirectory(path.join(os.homedir(), '.mosaic', '1', '500'));
+    this.readDirectory(folder);
     const filesInKeystore: string[] = fs.readdirSync(path.join(this.chainDir, 'keystore'));
 
     for (const file of filesInKeystore) {
@@ -715,6 +711,21 @@ export default class AuxiliaryChainInteract {
     }
 
     return addresses;
+  }
+
+  private readDirectory(path: string) {
+
+    fs.readdir(path, function (err, items) {
+      for (var i = 0; i < items.length; i++) {
+        var file = path + '/' + items[i];
+        console.log("Start: " + file);
+
+        fs.stat(file, function (err, stats) {
+          console.log(file);
+          console.log(stats["size"]);
+        });
+      }
+    })
   }
 
   /**
