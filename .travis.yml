@@ -24,7 +24,7 @@ notifications:
 install:
   - npm ci
 script:
-  - npm run test:integration
+  - sudo npm run test:integration
   - ls -l ~/.mosaic
 after_failure:
   - cat /home/travis/.npm/_logs/*-debug.log
