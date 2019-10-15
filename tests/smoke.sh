@@ -165,5 +165,7 @@ start_origin_node dev-origin geth
 start_auxiliary_node dev-auxiliary geth
 deploy_subgraph dev-origin 1000 origin 9535 6516
 deploy_subgraph dev-origin 1000 auxiliary 9020 6001
+rpc_origin_sub_graph_try 1000 61515
+rpc_auxiliary_sub_graph_try 1000 61000
 # When done, stop all nodes.
 stop_nodes
