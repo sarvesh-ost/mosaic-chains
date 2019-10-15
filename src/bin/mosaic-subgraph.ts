@@ -5,46 +5,71 @@ import * as commander from 'commander';
 import Logger from '../Logger';
 import MosaicConfig from '../Config/MosaicConfig';
 import SubGraph, { SubGraphType } from '../Graph/SubGraph';
-import TokenAddresses from '../Config/TokenAddresses';
+import GatewayAddresses from '../Config/GatewayAddresses';
+import GatewayConfig from '../Config/GatewayConfig';
 
 const mosaic = commander
   .arguments('<originChain> <auxiliaryChain> <subgraphType> <graphAdminRPC> <graphIPFS>');
 
-mosaic.option('-m,--mosaic-config <string>', 'Mosaic config absolute path');
-mosaic.option('-t,--token-config <string>', 'Token config absolute path');
-mosaic.option('-a,--auxiliary <string>', 'auxiliary chain identifier');
+mosaic.option('-m,--mosaic-config <string>', 'Mosaic config absolute path.');
+mosaic.option('-t,--gateway-config <string>', 'Gateway config absolute path.');
+mosaic.option('-a,--auxiliary <string>', 'auxiliary chain identifier.');
+mosaic.option('-g,--gateway-address <string>', 'gateway address of origin.');
 mosaic.action(
   async (
     originChain: string,
-    auxiliaryChain: string,
+    auxiliaryChain: number,
     subgraphType: SubGraphType,
     graphAdminRPC: string,
     graphIPFS: string,
     options,
   ) => {
     try {
-      let tokenAddresses;
+      let gatewayAddresses;
+      let gatewayConfig;
+      let mosaicConfig;
 
-      if (options.mosaicConfig) {
-        const mosaicConfig = MosaicConfig.fromFile(options.mosaicConfig);
-        tokenAddresses = TokenAddresses.fromMosaicConfig(mosaicConfig, auxiliaryChain);
-      } else if (MosaicConfig.exists(originChain)) {
-        const mosaicConfig = MosaicConfig.fromChain(originChain);
-        tokenAddresses = TokenAddresses.fromMosaicConfig(mosaicConfig, auxiliaryChain);
+      if (options.gatewayConfig) {
+        gatewayConfig = GatewayConfig.fromFile(options.gatewayConfig);
+      } else if (options.gatewayAddress) {
+        gatewayConfig = GatewayConfig.fromChain(
+          originChain,
+          auxiliaryChain,
+          options.gatewayAddress,
+        );
       }
 
-      if (!tokenAddresses) {
+      if (options.mosaicConfig) {
+        mosaicConfig = MosaicConfig.fromFile(options.mosaicConfig);
+      } else if (MosaicConfig.exists(originChain)) {
+        mosaicConfig = MosaicConfig.fromChain(originChain);
+      }
+
+      if (gatewayConfig) {
+        if (auxiliaryChain !== gatewayConfig.auxChainId) {
+          console.error(`Auxiliary chain id in gateway config is ${gatewayConfig.auxChainId} but value passed is ${auxiliaryChain}`);
+          process.exit(1);
+        }
+        gatewayAddresses = GatewayAddresses.fromGatewayConfig(gatewayConfig);
+      } else if (mosaicConfig) {
+        gatewayAddresses = GatewayAddresses.fromMosaicConfig(
+          mosaicConfig,
+          auxiliaryChain.toString(),
+        );
+      }
+
+      if (!gatewayAddresses) {
         console.error('Mosaic config or token config not found . Use --mosaic-config or --token-config option to provide path.');
         process.exit(1);
       }
 
       new SubGraph(
         originChain,
-        auxiliaryChain,
+        auxiliaryChain.toString(),
         subgraphType,
         graphAdminRPC,
         graphIPFS,
-        tokenAddresses,
+        gatewayAddresses,
       ).deploy();
     } catch (error) {
       Logger.error('error while executing mosaic libraries', { error: error.toString() });
