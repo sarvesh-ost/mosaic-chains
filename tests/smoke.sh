@@ -42,6 +42,8 @@ function stop_nodes {
     stop_node ropsten
     stop_node 1407
     stop_node 1406
+    stop_node dev-origin
+    stop_node dev-auxiliary
 }
 # Deploy subgraph
 # $1 origin chain identifier
@@ -123,41 +125,45 @@ try_silent "ls mosaic" "Script must be run from the mosaic chains root directory
 
 info "Starting node one by one and verifying if all services for them are running."
 
-start_auxiliary_node 1406
-grep_try 1406 geth
-rpc_node_try 1406
-deploy_subgraph ropsten 1406 auxiliary 9426 6407
-rpc_auxiliary_sub_graph_try 1406
+#start_auxiliary_node 1406
+#grep_try 1406 geth
+#rpc_node_try 1406
+#deploy_subgraph ropsten 1406 auxiliary 9426 6407
+#rpc_auxiliary_sub_graph_try 1406
+#
+#start_auxiliary_node 1407
+#grep_try 1407 geth
+#rpc_node_try 1407
+#deploy_subgraph ropsten 1407 auxiliary 9427 6408
+#rpc_auxiliary_sub_graph_try 1407
+#
+#start_origin_node ropsten geth
+#grep_try ropsten geth
+#rpc_node_try "0003" # Given like this as it is used for the port in `rpc_node_try`.
+#deploy_subgraph ropsten 1406 origin 8023 5004
+#deploy_subgraph ropsten 1407 origin 8023 5004
+#rpc_origin_sub_graph_try 1406 60003
+#rpc_origin_sub_graph_try 1407 60003
+#
+## Stop and start some nodes and make sure they are or are not running.
+#stop_node ropsten
+#grep_fail ropsten geth
+#
+#stop_node 1407
+#grep_fail 1407 geth
+#grep_try 1406 geth
+#
+#start_auxiliary_node 1407
+#grep_try 1407 geth
+#grep_try 1406 geth
+#grep_fail ropsten geth
+#
+#start_origin_node ropsten parity
+#grep_try ropsten parity
 
-start_auxiliary_node 1407
-grep_try 1407 geth
-rpc_node_try 1407
-deploy_subgraph ropsten 1407 auxiliary 9427 6408
-rpc_auxiliary_sub_graph_try 1407
-
-start_origin_node ropsten geth
-grep_try ropsten geth
-rpc_node_try "0003" # Given like this as it is used for the port in `rpc_node_try`.
-deploy_subgraph ropsten 1406 origin 8023 5004
-deploy_subgraph ropsten 1407 origin 8023 5004
-rpc_origin_sub_graph_try 1406 60003
-rpc_origin_sub_graph_try 1407 60003
-
-# Stop and start some nodes and make sure they are or are not running.
-stop_node ropsten
-grep_fail ropsten geth
-
-stop_node 1407
-grep_fail 1407 geth
-grep_try 1406 geth
-
-start_auxiliary_node 1407
-grep_try 1407 geth
-grep_try 1406 geth
-grep_fail ropsten geth
-
-start_origin_node ropsten parity
-grep_try ropsten parity
-
+start_origin_node dev-origin geth
+start_auxiliary_node dev-auxiliary geth
+deploy_subgraph dev-origin 1000 origin 9535 6516
+deploy_subgraph dev-origin 1000 auxiliary 9020 6001
 # When done, stop all nodes.
 stop_nodes
