@@ -47,7 +47,7 @@ mosaic.action(
 
       if (gatewayConfig) {
         if (parseInt(auxiliaryChain) !== gatewayConfig.auxChainId) {
-          console.error(`Auxiliary chain id in gateway config is ${gatewayConfig.auxChainId} but value passed is ${auxiliaryChain}`);
+          Logger.error(`Auxiliary chain id in gateway config is ${gatewayConfig.auxChainId} but value passed is ${auxiliaryChain}`);
           process.exit(1);
         }
         gatewayAddresses = GatewayAddresses.fromGatewayConfig(gatewayConfig);
@@ -59,7 +59,7 @@ mosaic.action(
       }
 
       if (!gatewayAddresses) {
-        console.error('Mosaic config or token config not found . Use --mosaic-config or --token-config option to provide path.');
+        Logger.error('Mosaic config or token config not found . Use --mosaic-config or --token-config option to provide path.');
         process.exit(1);
       }
 
@@ -72,8 +72,7 @@ mosaic.action(
         gatewayAddresses,
       ).deploy();
     } catch (error) {
-      console.log(error);
-      Logger.error('error while executing mosaic subgraph', { error: error.toString() });
+      Logger.error('error while executing mosaic libraries', { error: error.toString() });
       process.exit(1);
     }
 

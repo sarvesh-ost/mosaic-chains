@@ -16,8 +16,8 @@ mosaic.action(
     gatewayAddresses: string,
   ) => {
     const subGraphName = `mosaic/origin-${gatewayAddresses.substr(2, 25)}`
-    console.log('subgraphname  ', subGraphName);
-    console.log('graph ws port  ', graphWsPort);
+    Logger.info(`subgraph name for verification   ${subGraphName}`);
+    Logger.info(`graph ws port ${graphWsPort}`);
     const wsEndPoint = `ws://127.0.0.1:${graphWsPort}/subgraphs/name/${subGraphName}`;
 
     // Creates subscription client

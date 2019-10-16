@@ -16,7 +16,8 @@ mosaic.action(
     cogatewayAddress: string,
   ) => {
     const subGraphName = `mosaic/auxiliary-${cogatewayAddress.substr(2, 22)}`;
-    console.log('subgraphname  ', subGraphName);
+    Logger.info(`subgraph name for verification   ${subGraphName}`);
+    Logger.info(`graph ws port ${graphWsPort}`);
     const wsEndPoint = `ws://127.0.0.1:${graphWsPort}/subgraphs/name/${subGraphName}`;
 
     // Creates subscription client

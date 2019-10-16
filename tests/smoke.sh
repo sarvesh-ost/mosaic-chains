@@ -174,6 +174,7 @@ grep_fail ropsten geth
 start_origin_node ropsten parity
 grep_try ropsten parity
 
+# Deploy subgraph with gateway config
 start_origin_node dev-origin geth
 start_auxiliary_node dev-auxiliary geth
 deploy_subgraph_gateway_config dev-origin 1000 origin 9535 6516 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
