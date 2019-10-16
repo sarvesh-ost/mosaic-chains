@@ -124,13 +124,13 @@ function rpc_node_try {
 }
 
 function rpc_origin_sub_graph_try {
-    info "Checking RPC connection to origin sub graph at port $2 on node for $1."
+    info "Checking RPC connection to origin sub graph at port $1 on node for $2."
     try_silent "./node_modules/.bin/ts-node tests/Graph/SubGraphDeployment/origin-verifier.ts $1 $2" "Origin sub graph at port $2 was expected to be deployed on $1, but wasn't."
 }
 
 function rpc_auxiliary_sub_graph_try {
     info "Checking RPC connection to auxiliary sub graph for $1 chain on node."
-    try_silent "./node_modules/.bin/ts-node tests/Graph/SubGraphDeployment/auxiliary-verifier.ts $1 6$1" "Auxiliary sub graph was expected to be deployed, but wasn't."
+    try_silent "./node_modules/.bin/ts-node tests/Graph/SubGraphDeployment/auxiliary-verifier.ts 6$1 $2" "Auxiliary sub graph was expected to be deployed, but wasn't."
 }
 
 # Making sure the mosaic command exists (we are in the right directory).
@@ -178,7 +178,7 @@ start_origin_node dev-origin geth
 start_auxiliary_node dev-auxiliary geth
 deploy_subgraph_gateway_config dev-origin 1000 origin 9535 6516 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
 deploy_subgraph_gateway_config dev-origin 1000 auxiliary 9020 6001 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
-rpc_origin_sub_graph_try 1000 61515
-rpc_auxiliary_sub_graph_try 1000
+rpc_origin_sub_graph_try  61515 0xA7f056b1320fE619571849f138Cd1Ae2f2e64179
+rpc_auxiliary_sub_graph_try 1000 0xbc67Ff0116248762c940B97bA1501BeD6Fa6D093
 # When done, stop all nodes.
 stop_nodes
