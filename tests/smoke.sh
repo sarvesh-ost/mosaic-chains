@@ -178,7 +178,7 @@ start_origin_node dev-origin geth
 start_auxiliary_node dev-auxiliary geth
 deploy_subgraph_gateway_config dev-origin 1000 origin 9535 6516 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
 deploy_subgraph_gateway_config dev-origin 1000 auxiliary 9020 6001 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
-rpc_origin_sub_graph_try  61515 0xA7f056b1320fE619571849f138Cd1Ae2f2e64179
-rpc_auxiliary_sub_graph_try 1000 0xbc67Ff0116248762c940B97bA1501BeD6Fa6D093
+rpc_origin_sub_graph_try  61515 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
+rpc_auxiliary_sub_graph_try 1000 0xc6fF898ceBf631eFb58eEc7187E4c1f70AE8d943
 # When done, stop all nodes.
 stop_nodes
