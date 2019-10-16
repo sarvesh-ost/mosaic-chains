@@ -138,7 +138,7 @@ try_silent "ls mosaic" "Script must be run from the mosaic chains root directory
 
 info "Starting node one by one and verifying if all services for them are running."
 
-#start_auxiliary_node 1406
+start_auxiliary_node 1406
 grep_try 1406 geth
 rpc_node_try 1406
 deploy_subgraph ropsten 1406 auxiliary 9426 6407
