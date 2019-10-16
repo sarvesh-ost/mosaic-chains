@@ -8,14 +8,14 @@ import Logger from '../../../src/Logger';
 import WebSocket = require('ws');
 
 const mosaic = commander
-  .arguments('<auxiliary-chain-identifier> <graph-ws-port> <cogateway-address>');
+  .arguments('<graph-ws-port> <cogateway-address>');
 
 mosaic.action(
   async (
     graphWsPort: string,
     cogatewayAddress: string,
   ) => {
-    const subGraphName = `mosaic-auxiliary/${cogatewayAddress.substr(2, 32)}`;
+    const subGraphName = `mosaic/auxiliary-${cogatewayAddress.substr(2, 22)}`;
     console.log('subgraphname  ', subGraphName);
     const wsEndPoint = `ws://127.0.0.1:${graphWsPort}/subgraphs/name/${subGraphName}`;
 

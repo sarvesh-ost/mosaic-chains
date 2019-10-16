@@ -125,7 +125,7 @@ function rpc_node_try {
 
 function rpc_origin_sub_graph_try {
     info "Checking RPC connection to origin sub graph at port $1 on node for $2."
-    try_silent "./node_modules/.bin/ts-node tests/Graph/SubGraphDeployment/origin-verifier.ts $1 $2" "Origin sub graph at port $2 was expected to be deployed on $1, but wasn't."
+    try_silent "./node_modules/.bin/ts-node tests/Graph/SubGraphDeployment/origin-verifier.ts $1 $2" "Origin sub graph at port $1 was expected to be deployed on $2, but wasn't."
 }
 
 function rpc_auxiliary_sub_graph_try {
@@ -139,46 +139,46 @@ try_silent "ls mosaic" "Script must be run from the mosaic chains root directory
 info "Starting node one by one and verifying if all services for them are running."
 
 #start_auxiliary_node 1406
-#grep_try 1406 geth
-#rpc_node_try 1406
-#deploy_subgraph ropsten 1406 auxiliary 9426 6407
-#rpc_auxiliary_sub_graph_try 1406
+grep_try 1406 geth
+rpc_node_try 1406
+deploy_subgraph ropsten 1406 auxiliary 9426 6407
+rpc_auxiliary_sub_graph_try 1406 0x02cffaa1e06c28021fff6b36d9e418a97b3de2fc
 #
-#start_auxiliary_node 1407
-#grep_try 1407 geth
-#rpc_node_try 1407
-#deploy_subgraph ropsten 1407 auxiliary 9427 6408
-#rpc_auxiliary_sub_graph_try 1407
+start_auxiliary_node 1407
+grep_try 1407 geth
+rpc_node_try 1407
+deploy_subgraph ropsten 1407 auxiliary 9427 6408
+rpc_auxiliary_sub_graph_try 1407 0xf690624171fe06d02d2f4250bff17fe3b682ebd1
+##
+start_origin_node ropsten geth
+grep_try ropsten geth
+rpc_node_try "0003" # Given like this as it is used for the port in `rpc_node_try`.
+deploy_subgraph ropsten 1406 origin 8023 5004
+deploy_subgraph ropsten 1407 origin 8023 5004
+rpc_origin_sub_graph_try 60003 0x04df90efbedf393361cdf498234af818da14f562
+rpc_origin_sub_graph_try 60003 0x31c8870c76390c5eb0d425799b5bd214a2600438
+##
+### Stop and start some nodes and make sure they are or are not running.
+stop_node ropsten
+grep_fail ropsten geth
+##
+stop_node 1407
+grep_fail 1407 geth
+grep_try 1406 geth
+##
+start_auxiliary_node 1407
+grep_try 1407 geth
+grep_try 1406 geth
+grep_fail ropsten geth
+##
+start_origin_node ropsten parity
+grep_try ropsten parity
 #
-#start_origin_node ropsten geth
-#grep_try ropsten geth
-#rpc_node_try "0003" # Given like this as it is used for the port in `rpc_node_try`.
-#deploy_subgraph ropsten 1406 origin 8023 5004
-#deploy_subgraph ropsten 1407 origin 8023 5004
-#rpc_origin_sub_graph_try 1406 60003
-#rpc_origin_sub_graph_try 1407 60003
-#
-## Stop and start some nodes and make sure they are or are not running.
-#stop_node ropsten
-#grep_fail ropsten geth
-#
-#stop_node 1407
-#grep_fail 1407 geth
-#grep_try 1406 geth
-#
-#start_auxiliary_node 1407
-#grep_try 1407 geth
-#grep_try 1406 geth
-#grep_fail ropsten geth
-#
-#start_origin_node ropsten parity
-#grep_try ropsten parity
-
 start_origin_node dev-origin geth
 start_auxiliary_node dev-auxiliary geth
 deploy_subgraph_gateway_config dev-origin 1000 origin 9535 6516 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
 deploy_subgraph_gateway_config dev-origin 1000 auxiliary 9020 6001 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
-rpc_origin_sub_graph_try  61515 0xae02c7b1c324a8d94a564bc8d713df89eae441fe
+rpc_origin_sub_graph_try  61515 0xaE02C7b1C324A8D94A564bC8d713Df89eae441fe
 rpc_auxiliary_sub_graph_try 1000 0xc6fF898ceBf631eFb58eEc7187E4c1f70AE8d943
-# When done, stop all nodes.
+## When done, stop all nodes.
 stop_nodes
