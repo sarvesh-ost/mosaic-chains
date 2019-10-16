@@ -72,7 +72,8 @@ mosaic.action(
         gatewayAddresses,
       ).deploy();
     } catch (error) {
-      Logger.error('error while executing mosaic libraries', { error: error.toString() });
+      console.log(error);
+      Logger.error('error while executing mosaic subgraph', { error: error.toString() });
       process.exit(1);
     }
 

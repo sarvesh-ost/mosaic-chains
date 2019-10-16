@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as mustache from 'mustache';
+import * as web3Utils from 'web3-utils';
 import Logger from '../Logger';
 import Shell from '../Shell';
 import Directory from '../Directory';
@@ -177,9 +178,9 @@ export default class SubGraph {
    */
   private get name(): string {
     if (this.subGraphType === SubGraphType.ORIGIN) {
-      return `mosaic/origin-${this.auxiliaryChain}`;
+      return `mosaic/origin-${web3Utils.sha3(this.gatewayAddresses.eip20GatewayAddress)}`;
     }
-    return `mosaic/auxiliary-${this.auxiliaryChain}`;
+    return `mosaic/auxiliary-${web3Utils.sha3(this.gatewayAddresses.eip20CoGatewayAddress)}`;
   }
 
   /**
