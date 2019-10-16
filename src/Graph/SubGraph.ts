@@ -178,9 +178,9 @@ export default class SubGraph {
    */
   private get name(): string {
     if (this.subGraphType === SubGraphType.ORIGIN) {
-      return `mosaic-origin/${web3Utils.toAscii(web3Utils.sha3(this.gatewayAddresses.eip20GatewayAddress).substr(2))}`;
+      return `mosaic-origin/${this.gatewayAddresses.eip20GatewayAddress.substr(0, 32)}`;
     }
-    return `mosaic-auxiliary/${web3Utils.toAscii(web3Utils.sha3(this.gatewayAddresses.eip20CoGatewayAddress).substr(2))}`;
+    return `mosaic-auxiliary/${this.gatewayAddresses.eip20CoGatewayAddress.substr(0, 32)}`;
   }
 
   /**
