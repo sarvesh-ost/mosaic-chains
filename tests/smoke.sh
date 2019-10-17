@@ -66,7 +66,7 @@ function  deploy_subgraph {
 # gateway config
 function  deploy_subgraph_gateway_config {
     info "Deploying origin subraph."
-    try_silent "./mosaic subgraph $1 $2 $3 http://localhost:$4 http://localhost:$5 --gateway-config ~/.mosaic/$1/$2/$6.json"
+    try_silent "./mosaic subgraph $1 $2 $3 http://localhost:$4 http://localhost:$5 --gateway-config ~/.mosaic/$1/$2/$( echo "$6" | tr -s  '[:upper:]'  '[:lower:]' ).json"
 }
 
 
@@ -132,6 +132,10 @@ function rpc_origin_sub_graph_try {
 function rpc_auxiliary_sub_graph_try {
     info "Checking RPC connection to auxiliary sub graph for $1 chain on node."
     try_silent "./node_modules/.bin/ts-node tests/Graph/SubGraphDeployment/auxiliary-verifier.ts 6$1 $2" "Auxiliary sub graph was expected to be deployed, but wasn't."
+}
+
+function toLowerCase {
+    return
 }
 
 # Making sure the mosaic command exists (we are in the right directory).
@@ -202,6 +206,7 @@ GRAPH_IPFS_DEV_AUXILIARY=6001
 #start_origin_node ropsten parity
 #grep_try ropsten parity
 
+
 # Deploy subgraph with gateway config
 start_origin_node dev-origin geth
 start_auxiliary_node dev-auxiliary geth
@@ -209,5 +214,5 @@ deploy_subgraph_gateway_config dev-origin $DEV_AUXILIARY_CHAIN_ID origin $GRAPH_
 deploy_subgraph_gateway_config dev-origin $DEV_AUXILIARY_CHAIN_ID auxiliary $GRAPH_ADMIN_RPC_DEV_AUXILIARY $GRAPH_IPFS_DEV_AUXILIARY $OST_GATEWAY_ADDRESS_DEV_ORIGIN_WETH
 rpc_origin_sub_graph_try  $GRAPH_WS_PORT_DEV_ORIGIN $OST_GATEWAY_ADDRESS_DEV_ORIGIN_WETH
 rpc_auxiliary_sub_graph_try $DEV_AUXILIARY_CHAIN_ID $OST_CO_GATEWAY_ADDRESS_DEV_ORIGIN_WETH
-# When done, stop all nodes.
+## When done, stop all nodes.
 stop_nodes
